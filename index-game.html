@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+	
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+
+	margin-left:350px ;
+	margin-top:25px;
+	
+
+}
+
+.p_div{
+	float:left;
+	
+}
+</style>
+</head>
+<body onload="startGame()" style="background-image: url('images/icon-pattern.jpg')">
+<script>
+
+var myGamePiece;
+var myObstacle=[];
+
+function startGame() {
+    myGamePiece = new component(30, 30, "blue", 10, 50);
+    myObstacle.push( new component(400, 40, "red", 0, 0));    
+	myObstacle.push( new component(40, 400, "red", 80, 100)); 
+	myObstacle.push( new component(40, 100, "red", 180, 0));    
+	myObstacle.push( new component(180, 40, "red", 200, 140)); 
+	myObstacle.push( new component(40, 80, "red", 200, 420));    
+	myObstacle.push( new component(40, 200, "red", 200, 170)); 
+	myObstacle.push( new component(40, 350, "red", 500, 150));    
+		myObstacle.push( new component(40, 250, "red", 350, 250));    
+	myObstacle.push( new component(100, 40, "red", 350, 0)); 
+    myObstacle.push( new component(40, 180, "red", 350, 0)); 
+	    myObstacle.push( new component(40, 80, "red", 500, 0)); 
+	    myObstacle.push( new component(40, 250, "red", 650, 0)); 
+		myObstacle.push( new component(120, 40, "red", 540, 0)); 
+			myObstacle.push( new component(120, 40, "red", 600, 350)); 
+		    myObstacle.push( new component(40, 150, "red", 680, 350)); 
+				myObstacle.push( new component(150, 40, "red", 750, 0));
+			    myObstacle.push( new component(150, 40, "red", 750, 100));
+				myObstacle.push( new component(40, 400, "red", 860, 100));
+		myFinish=new component(20,60,"green",880,40);
+	    myQPiece1 = new component(30, 30, "yellow", 150, 300);
+		myQPiece2 = new component(30, 30, "yellow", 500, 100);
+				
+	myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width =850;
+        this.canvas.height = 500;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 30);
+    },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+function component(width, height, color, x, y) {
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = myGameArea.context;
+        ctx.fillStyle = color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;        
+    }
+
+	this.crashWith = function(otherobj) {
+    var myleft = this.x;
+    var myright = this.x + (this.width);
+    var mytop = this.y;
+    var mybottom = this.y + (this.height);
+    var otherleft = otherobj.x;
+    var otherright = otherobj.x + (otherobj.width);
+    var othertop = otherobj.y;
+    var otherbottom = otherobj.y + (otherobj.height);
+    var crash = true;
+    if ((mybottom < othertop) ||
+    (mytop > otherbottom) ||
+    (myright < otherleft) ||
+    (myleft > otherright)) {
+      crash = false;
+    }
+    return crash;
+  }
+}
+
+function updateGameArea() {
+
+
+	for(i=0;i<myObstacle.length;i+=1){
+		if(myGamePiece.crashWith(myObstacle[i])){
+			myGamePiece.x=10;
+			myGamePiece.y=50;		
+		}
+	
+	}
+	
+	if (myGamePiece.crashWith(myQPiece1)) {
+		alert("Question 1");
+		myGamePiece.y+=70;
+		myGamePiece.speedY=0;
+		myQPiece1.width=0;
+		myQPiece1.height=0;
+		
+		
+  } 
+  else if(myGamePiece.crashWith(myQPiece2)){
+		alert("Question 2")
+		myGamePiece.x+=70;
+		myGamePiece.speedX=0;
+		myQPiece2.width=0;
+		myQPiece2.height=0;
+  }
+  
+  else if(myGamePiece.crashWith(myFinish)){
+		alert("You Have Finished");
+  
+  }
+  
+	else{
+    myGameArea.clear();
+	for (i=0;i<myObstacle.length;i+=1){
+    myObstacle[i].update();
+	}
+	myFinish.update();
+	myQPiece1.update();
+	myQPiece2.update();	
+    myGamePiece.newPos();    
+    myGamePiece.update();
+	}  
+}
+
+function moveup() {
+    myGamePiece.speedY = -5; 
+}
+
+function movedown() {
+    myGamePiece.speedY = 5; 
+}
+
+function moveleft() {
+    myGamePiece.speedX = -1; 
+}
+
+function moveright() {
+    myGamePiece.speedX = 1; 
+}
+
+function clearmove() {
+    myGamePiece.speedX = 0; 
+    myGamePiece.speedY = 0; 
+}
+</script>
+<div class="p_div" style="text-align:center;width:400px;">
+  <button type="button" class="btn-primary" onmousedown="moveup()" onmouseup="clearmove()" ontouchstart="moveup()">UP</button><br><br>
+  <button type="button" class="btn-primary" onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()">LEFT</button>
+  <button type="button" class="btn-primary" onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()">RIGHT</button><br><br>
+  <button type="button" class="btn-primary" onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()">DOWN</button>
+</div>
+</body>
+</html>
